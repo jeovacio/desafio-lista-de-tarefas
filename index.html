@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas</title>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="style-dark.css">
+</head>
+<body>
+    <img class="fundo" src="images/bg-desktop-dark.jpg" alt="imagem">
+    <main>
+        <div class="titulo">
+            <h1>TODO</h1>
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path fill="#FFF" fill-rule="evenodd" d="M13 21a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-5.657-2.343a1 1 0 010 1.414l-2.121 2.121a1 1 0 01-1.414-1.414l2.12-2.121a1 1 0 011.415 0zm12.728 0l2.121 2.121a1 1 0 01-1.414 1.414l-2.121-2.12a1 1 0 011.414-1.415zM13 8a5 5 0 110 10 5 5 0 010-10zm12 4a1 1 0 110 2h-3a1 1 0 110-2h3zM4 12a1 1 0 110 2H1a1 1 0 110-2h3zm18.192-8.192a1 1 0 010 1.414l-2.12 2.121a1 1 0 01-1.415-1.414l2.121-2.121a1 1 0 011.414 0zm-16.97 0l2.121 2.12A1 1 0 015.93 7.344L3.808 5.222a1 1 0 011.414-1.414zM13 0a1 1 0 011 1v3a1 1 0 11-2 0V1a1 1 0 011-1z"/></svg>
+        </div>
+        <input id="txt1" type="text" placeholder="Create a new todo..." onkeydown="tecleEnter(event)" maxlength="25">
+        <article id="lst1"></article>
+        <div class="rodape">
+            <span>items left</span>
+            <span>
+                <span>All</span>
+                <span>Active</span>
+                <span>Completed</span>
+            </span>
+            <span>Clear Completed</span>
+        </div>
+    </main>
+    
+
+    <script>
+        var texto = document.getElementById('txt1')
+
+        function tecleEnter(event) {
+            if (event.keyCode === 13) {
+                add()
+            }
+        }
+        
+        addEventListener('conteudoCarregado', function() {
+            var conteudoSalvo = localStorage.getItem('conteudo')
+            if (conteudoSalvo) {
+                tarefa.innerHTML = conteudoSalvo;
+                atualizarCheckbox();
+            }
+        });
+
+        function novocheck(checkbox) {
+            var filho = checkbox.parentElement.parentElement
+            var checado = checkbox.getAttribute('data-checked')
+
+            if (checado === 'false') {
+                checkbox.setAttribute('data-checked', 'true')
+                filho.style.textDecoration = 'line-through'
+                filho.style.color = 'hsl(236, 33%, 92%)'
+                filho.style.border = '2px solid red'
+            } else {
+                checkbox.setAttribute('data-checked', 'false')
+                filho.style.textDecoration = 'none'
+                filho.style.color = 'hsl(236, 33%, 92%)'
+                filho.style.border = 'none'
+            }
+            tarefasSalvas();
+        }
+
+        function add() {
+            if (texto.value.trim() === '') {
+                alert('Você não digitou uma tarefa válida. Por favor, digite uma tarefa.')  
+            } else {
+                var tarefa = document.getElementById('lst1')
+                var checkboxId = 'check' + Math.floor(Math.random() * 999999)
+                tarefa.innerHTML += 
+                    `<p class="checked">
+                        <span>
+                            <input type="checkbox" id="${checkboxId}" onclick="novocheck(this)" class="check2" data-checked="false"/>
+                            <label for="${checkboxId}"></label>
+                        </span>
+                    ${texto.value}
+                        <svg onclick="removerTarefa(this)" class="img2" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 18L18 6M6 6L18 18" stroke="#FF497D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </p>`
+                tarefa.scrollTop = tarefa.scrollHeight
+                texto.value = ''
+                tarefasSalvas();
+            }
+        }   
+
+        function removerTarefa(remove) {
+            var exit = remove.parentElement
+            exit.remove()
+            tarefasSalvas()
+        }
+
+        function atualizarCheckbox() {
+            var checkboxes = document.querySelectorAll('.check2')
+            checkboxes.forEach(function(checkbox) {
+                var filho = checkbox.parentElement.parentElement
+                var checado = checkbox.getAttribute('data-checked')
+
+                if (checado === 'true') {
+                    checkbox.checked = true
+                    filho.style.textDecoration = 'line-through'
+                    filho.style.color = 'hsl(234, 11%, 52%)'
+                    filho.style.border = '1px solid red'
+                } else {
+                    checkbox.checked = false
+                    filho.style.textDecoration = 'none'
+                    filho.style.color = 'hsl(234, 39%, 85%)'
+                    filho.style.borderBottom = '1px solid hsl(237, 14%, 26%)'
+                    filho.style.outline = ''
+                }
+            });
+        }
+
+        function tarefasSalvas() {
+            atualizarCheckbox()
+            var tarefas = tarefa.innerHTML
+            localStorage.setItem('tarefas', tarefas)
+        }
+    </script>
+</body>
+</html>
